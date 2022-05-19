@@ -1,2 +1,9 @@
 select distinct count(*) as distinct_count from clinical_trail
 select Type,count(Type) as count from clinical_trail group by Type order by count desc
+create view conditions_view as select split(conditions,',') as conditions_explode from clinical_trail
+select names,count(names) as count from conditions_view cross join unnest(conditions_explode) as t(names) where "names" <> '' group by names order by count desc limit 5
+create view mesh_split as select term,element_At(split(tree,'.'),1) as tree_code from mesh
+create view conditions_mesh as select names from conditions_view cross join unnest(conditions_explode) as t(names) where "names" <> ''
+select tree_code,count(tree_code) as count from mesh_Split as m join conditions_mesh as c on m.term = c.names group by tree_code order by count desc limit 10
+select Sponsor,count(Sponsor) as count from clinical_trail where Sponsor not in (select REPLACE(parent_company,'"','') as parent from pharma) group by Sponsor order by count desc limit 10
+select element_at(split(completion,' '),1) as month,count(element_at(split(Completion,' '),1)) as count from clinical_trail where status='Completed' group by element_at(split(completion,' '),1),element_at(split(Completion,' '),-1) having element_at(split(Completion,' '),-1) = '2021'
