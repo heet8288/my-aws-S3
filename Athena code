@@ -1,0 +1,2 @@
+select distinct count(*) as distinct_count from clinical_trail
+select Type,count(Type) as count from clinical_trail group by Type order by count desc
